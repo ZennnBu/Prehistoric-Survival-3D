@@ -1,0 +1,37 @@
+
+name: Godot Project Check
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Godot Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Godot 4.3
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Show Godot Version
+        run: godot --version
+
+      - name: Import and Validate Project
+        run: godot --headless --editor --path . --quit
+
+      - name: Test Main Scene
+        run: godot --headless --path . --quit-after 5
+        
