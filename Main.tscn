@@ -1,0 +1,39 @@
+
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_main"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.35, 0.65, 0.85, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.8, 0.85, 1, 1)
+ambient_light_energy = 0.7
+
+[sub_resource type="PlaneMesh" id="Plane_ground"]
+size = Vector2(100, 100)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.5, 0)
+mesh = SubResource("Plane_ground")
+
+[node name="GroundCollision" type="StaticBody3D" parent="Ground"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/GroundCollision"]
+shape = BoxShape3D.new()
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-50, -30, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 8, 12)
+rotation_degrees = Vector3(-25, 0, 0)
+current = true
