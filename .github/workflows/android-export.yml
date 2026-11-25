@@ -37,19 +37,53 @@ jobs:
 
       - name: Install Android SDK Packages
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmake;3.10.2.4988404" "ndk;23.2.8568313"
+          sdkmanager --sdk_root="$ANDROID_HOME" \
+            "cmdline-tools;latest" \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "cmake;3.10.2.4988404" \
+            "ndk;23.2.8568313"
 
-      - name: Check Android Export Preset
+      - name: Configure Godot Android Paths
         run: |
-          if [ ! -f export_presets.cfg ]; then
-            echo "Android export preset is missing."
-            exit 1
-          fi
+          mkdir -p "$HOME/.config/godot"
+
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          EOF
+
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+
+      - name: Check Export Preset
+        run: |
+          test -f export_presets.cfg
+          echo "Export preset found."
+
+      - name: Check Godot Project
+        run: |
+          godot --headless --editor --path . --quit --verbose
 
       - name: Export APK
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/PrehistoricSurvival.apk
+          godot --headless --path . \
+            --export-debug "Android" \
+            build/PrehistoricSurvival.apk \
+            --verbose
+
+      - name: Check APK File
+        run: |
+          if [ ! -f build/PrehistoricSurvival.apk ]; then
+            echo "APK was not created."
+            exit 1
+          fi
+          ls -lh build/PrehistoricSurvival.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
