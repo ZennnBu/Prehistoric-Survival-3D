@@ -26,24 +26,23 @@ jobs:
           use-dotnet: false
           include-templates: true
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Install Android SDK Packages
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmake;3.10.2.4988404" "ndk;23.2.8568313"
 
       - name: Check Android Export Preset
         run: |
           if [ ! -f export_presets.cfg ]; then
             echo "Android export preset is missing."
-            echo "Create an Android preset in Godot and commit export_presets.cfg."
             exit 1
           fi
 
