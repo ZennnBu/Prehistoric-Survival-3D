@@ -3,8 +3,10 @@ extends Node3D
 
 const TREE_COUNT := 35
 const ROCK_COUNT := 25
+const DINOSAUR_COUNT := 4
 
 const PLAYER_SCENE := preload("res://Player.tscn")
+const DINOSAUR_SCENE := preload("res://Dinosaur.tscn")
 
 var rng := RandomNumberGenerator.new()
 
@@ -16,6 +18,7 @@ func _ready() -> void:
     generate_trees()
     generate_rocks()
     spawn_player()
+    spawn_dinosaurs()
 
 
 func setup_ground() -> void:
@@ -38,6 +41,23 @@ func spawn_player() -> void:
 
     var player_camera: Camera3D = player.get_node("Camera3D")
     player_camera.make_current()
+
+
+func spawn_dinosaurs() -> void:
+    for i in range(DINOSAUR_COUNT):
+        var dinosaur := DINOSAUR_SCENE.instantiate()
+
+        dinosaur.name = "Dinosaur_%d" % i
+
+        var x := rng.randf_range(-30.0, 30.0)
+        var z := rng.randf_range(-30.0, 30.0)
+
+        if Vector2(x, z).length() < 12.0:
+            x += 15.0
+
+        dinosaur.position = Vector3(x, 0.05, z)
+
+        add_child(dinosaur)
 
 
 func generate_trees() -> void:
