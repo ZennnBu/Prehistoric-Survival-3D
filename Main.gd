@@ -1,13 +1,12 @@
 
 extends Node3D
 
-const WORLD_SIZE := 100.0
 const TREE_COUNT := 35
 const ROCK_COUNT := 25
 
-var rng := RandomNumberGenerator.new()
+const PLAYER_SCENE := preload("res://Player.tscn")
 
-@onready var ground_mesh: MeshInstance3D = $Ground/GroundMesh
+var rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
@@ -16,9 +15,12 @@ func _ready() -> void:
     setup_ground()
     generate_trees()
     generate_rocks()
+    spawn_player()
 
 
 func setup_ground() -> void:
+    var ground_mesh: MeshInstance3D = $Ground/GroundMesh
+
     var material := StandardMaterial3D.new()
     material.albedo_color = Color(0.18, 0.38, 0.12)
     material.roughness = 1.0
@@ -26,15 +28,28 @@ func setup_ground() -> void:
     ground_mesh.material_override = material
 
 
+func spawn_player() -> void:
+    var player := PLAYER_SCENE.instantiate()
+
+    player.name = "Player"
+    player.position = Vector3(0, 0.05, 0)
+
+    add_child(player)
+
+    var player_camera: Camera3D = player.get_node("Camera3D")
+    player_camera.make_current()
+
+
 func generate_trees() -> void:
     for i in range(TREE_COUNT):
         var tree := Node3D.new()
         tree.name = "AncientTree_%d" % i
 
-        var x := rng.randf_range(-45.0, 45.0)
-        var z := rng.randf_range(-45.0, 45.0)
-
-        tree.position = Vector3(x, 0.0, z)
+        tree.position = Vector3(
+            rng.randf_range(-45.0, 45.0),
+            0.0,
+            rng.randf_range(-45.0, 45.0)
+        )
 
         var trunk := MeshInstance3D.new()
         var trunk_mesh := CylinderMesh.new()
@@ -80,7 +95,6 @@ func generate_rocks() -> void:
         rock.name = "AncientRock_%d" % i
 
         var rock_mesh := SphereMesh.new()
-
         var size := rng.randf_range(0.5, 1.5)
 
         rock_mesh.radius = size
